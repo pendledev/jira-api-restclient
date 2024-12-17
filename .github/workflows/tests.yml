@@ -60,4 +60,16 @@ jobs:
 
       - name: Run tests
         run: |
-          vendor/bin/phpunit -v
+          vendor/bin/phpunit --log-junit junit.xml --coverage-clover build/logs/clover.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        if: ${{ !cancelled() }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        uses: codecov/test-results-action@v1
+        if: ${{ !cancelled() }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
