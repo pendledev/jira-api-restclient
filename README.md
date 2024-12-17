@@ -1,6 +1,6 @@
 # Jira REST API Client
 
-[![CI](https://github.com/chobie/jira-api-restclient/actions/workflows/tests.yml/badge.svg)](https://github.com/chobie/jira-api-restclient/actions/workflows/tests.yml)
+[![CI](https://github.com/console-helpers/jira-api-restclient/actions/workflows/tests.yml/badge.svg)](https://github.com/console-helpers/jira-api-restclient/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/console-helpers/jira-api-restclient/graph/badge.svg?token=IWqgUnNjFM)](https://codecov.io/gh/console-helpers/jira-api-restclient)
 
 You all know that Jira supports REST API, right? It can be very useful, for example, during automation job creation and notification sending.
