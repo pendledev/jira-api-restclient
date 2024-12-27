@@ -22,6 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 namespace chobie\Jira;
 
 
@@ -32,6 +33,7 @@ use chobie\Jira\Api\Result;
 
 class Api
 {
+
 	const REQUEST_GET = 'GET';
 	const REQUEST_POST = 'POST';
 	const REQUEST_PUT = 'PUT';
@@ -684,10 +686,10 @@ class Api
 		array $application = null
 	) {
 		$options = array(
-						'globalId' => $global_id,
-						'relationship' => $relationship,
-						'object' => $object,
-					);
+			'globalId' => $global_id,
+			'relationship' => $relationship,
+			'object' => $object,
+		);
 
 		if ( !is_null($application) ) {
 			$options['application'] = $application;
