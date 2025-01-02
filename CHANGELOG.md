@@ -19,35 +19,55 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Allow getting issue count back from `Walker` class by [@aik099].
 - Setup `.gitattributes` for better `CHANGELOG.md` merging by [@glensc].
 - Added `Api::addWorklog` and `Api::deleteWorklog` calls for more control over the work logs [@dumconstantin] and [@aik099].
+- Added `Api::getWorklogs` call for getting issue work logs by [@camspanos] (#37).
+- Added `Api::createRemotelink` call for linking issue with its remote applications by [@elmi82] (#43).
+- Added `Api::findVersionByName` call for getting project version information by its name by [@jpastoor] (#82).
+- Added `Api::updateVersion` call for editing version by [@jpastoor] (#82).
+- Added `Api::releaseVersion` call for marking version as released by [@jpastoor] (#82).
+- Added `Api::getAttachmentsMetaInformation` call for getting attachments meta information by [@N-M] (#101).
+- Added `Api::getProjectComponents` call for getting project components by [@N-M] (#104).
+- Added `Api::getProjectIssueTypes` call for getting project issue types and issue statuses connected to them by [@N-M] (#104).
+- Added `Api::getResolutions` call for getting available issue resolutions by [@N-M] (#104).
+- Allow configuring issues queried per page in `Walker` class by [@aik099] (#142).
+- Allow getting issue count back from `Walker` class by [@aik099] (#149).
+- Setup `.gitattributes` for better `CHANGELOG.md` merging by [@glensc] (#185).
 
 ### Changed
-- Classes/interfaces were renamed to use namespaces by [@chobie].
+- Classes/interfaces were renamed to use namespaces by [@chobie] (#21).
 - Using PSR-4 autoloader from Composer by [@chobie].
-- Minimal supported PHP version changed from 5.2 to 5.3 by [@chobie].
-- The `Api::getPriorties` renamed into `Api::getPriorities` by [@josevh].
-- Remove trailing slash from endpoint url by [@Procta].
-- Added local cache to getResolutions by [@jpastoor].
-- Renamed Api::api() parameter $return_as_json to $return_as_array by [@jpastoor].
-- Renamed `Api::createRemotelink` to `Api::createRemoteLink` by [@glensc].
-- Minimal supported PHP version changed from 5.3 to 5.6 by [@aik099].
+- Minimal supported PHP version changed from 5.2 to 5.3 by [@chobie] (#21).
+- The `Api::getPriorties` renamed into `Api::getPriorities` by [@josevh] and [@jpastoor] (#68).
+- The `Api::setEndPoint` now also removes trailing slash from the given url by [@Procta] (#67).
+- Added local cache to getResolutions by [@jpastoor] (#131).
+- Renamed Api::api() parameter `$return_as_json` to `$return_as_array` by [@jpastoor] (#134).
+- Renamed `Api::createRemotelink` to `Api::createRemoteLink` by [@glensc] (#183).
+- The `CurlClient::sendRequest` is throwing exception, when `$data` parameter isn't an array and `$method` is GET by [@alopex06] (#100).
+- Minimal supported PHP version changed from 5.3 to 5.6 by [@aik099] (#207).
+- Enhance `Api::getCreateMeta` call with an optional ability (via the new `$expand` parameter) to return issue fields by [@arnested] (#26).
+- Added an optional `$name` parameter (replaces `$options` parameter) to `Api::createAttachment` for specifying name of the uploaded file by [@betterphp] (#141).
 
 ### Removed
 ...
 
 ### Fixed
-- Attachments created using `PHPClient` were not accessible from JIRA by [@ubermuda].
-- Inability to create attachment using `CurlClient` on PHP 5.6+ by [@shmaltorhbooks].
-- The `Api::getIssueTypes` call wasn't working on JIRA 6.4+ due new `avatarId` parameter for issue types by [@addersuk].
-- The `CurlClient` wasn't recognizing `201` response code as success (e.g. used by `/rest/api/2/issueLink` API call) by [@zuzmic].
-- Anonymous access to JIRA from `CurlClient` wasn't working by [@digitalkaoz].
-- Fixed PHP deprecation notice, when creating issue attachments via `CurlClient` on PHP 5.5+ by [@DerMika].
-- The `Api::getRoles` call was always retuning an error by [@aik099].
-- Attempt to make a `DELETE` API call using `CurlClient` wasn't working by [@aik099].
-- Clearing local caches (statuses, priorities, fields and resolutions) on endpoint change by [@jpastoor].
-- Error details from failed API calls were not available back from `Api::api method` call by [@betterphp].
-- Warning about `count()` function usage on PHP 7.2, when searching for issues by [@aik099].
-- Capitalize `globalId` properly in `createRemotelink` [@glensc].
-- The `Api::getIssueTypes` was always returning an error by [@aik099].
+- Attachments created using `PHPClient` were not accessible from JIRA by [@ubermuda] (#59).
+- Inability to create attachment using `CurlClient` on PHP 5.6+ by [@shmaltorhbooks] (#52).
+- The `Api::getIssueTypes` call wasn't working on JIRA 6.4+ due new `avatarId` parameter for issue types by [@addersuk] (#50).
+- The `CurlClient` wasn't recognizing `201` response code as success (e.g. used by `/rest/api/2/issueLink` API call) by [@zuzmic] (#40).
+- Anonymous access to JIRA from `CurlClient` wasn't working by [@digitalkaoz] (#32).
+- Fixed PHP deprecation notice, when creating issue attachments via `CurlClient` on PHP 5.5+ by [@DerMika] (#86).
+- The `Api::getRoles` call was always retuning an error by [@aik099] (#99).
+- Attempt to make a `DELETE` API call using `CurlClient` wasn't working by [@aik099] (#115).
+- Clearing local caches (statuses, priorities, fields and resolutions) on endpoint change by [@jpastoor] (#131).
+- Error details from failed API calls were not available back from `Api::api method` call by [@betterphp] (#140).
+- Warning about `count()` function usage on PHP 7.2, when searching for issues by [@aik099] (#174).
+- The `Api::createRemotelink` wasn't updating an existing remote link, because given `$global_id` parameter was incorrectly passed to the Jira by  [@glensc] (#178).
+- The `Api::getIssueTypes` was always returning an error, because `entityId`, `hierarchyLevel` and `untranslatedName` issue type properties weren't supported by [@aik099] (#208).
+- The `PHPClient` was sending wrong `Content-Type` header for GET requests by [@aik099] (#108).
+- Attempt to make a `DELETE` API call using `PHPClient` wasn't working by [@aik099] (#108).
+- The `PHPClient` thrown exceptions weren't inline with `CurlClient` thrown exceptions by [@aik099] (#108).
+- Fixed the `CurlClient` inability to perform an SSL connection from macOS due to locked HTTP protocol version by [@benPesso] (#147).
+- The `Api::getIssueTypes` method was always throwing an error due to `scope` issue type parameter wasn't supported by [@danillofb] (#181).
 
 ## [1.0.0] - 2014-07-27
 ### Added
@@ -73,3 +93,6 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 [@betterphp]: https://github.com/betterphp
 [@glensc]: https://github.com/glensc
 [@dumconstantin]: https://github.com/dumconstantin
+[@alopex06]: https://github.com/alopex06
+[@benPesso]: https://github.com/benPesso
+[@danillofb]: https://github.com/danillofb
