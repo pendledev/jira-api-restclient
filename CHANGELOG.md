@@ -45,6 +45,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Minimal supported PHP version changed from 5.3 to 5.6 by [@aik099] (#207).
 - Enhance `Api::getCreateMeta` call with an optional ability (via the new `$expand` parameter) to return issue fields by [@arnested] (#26).
 - Added an optional `$name` parameter (replaces `$options` parameter) to `Api::createAttachment` for specifying name of the uploaded file by [@betterphp] (#141).
+- The `$method` parameter of the `Api::api` method is now mandatory (previously had `self::REQUEST_GET` value) by [@aik099] (#226).
+- The `$data` parameter of the `ClientInterface::sendRequest` method is now mandatory (previously had `array()` value) by [@aik099] (#226).
 
 ### Removed
 ...
