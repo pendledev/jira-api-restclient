@@ -64,7 +64,7 @@ class MemcacheProxyClient implements ClientInterface
 	 *
 	 * @param string                  $method     Request method.
 	 * @param string                  $url        URL.
-	 * @param array                   $data       Request data.
+	 * @param array|string            $data       Request data.
 	 * @param string                  $endpoint   Endpoint.
 	 * @param AuthenticationInterface $credential Credential.
 	 * @param boolean                 $is_file    This is a file upload request.
@@ -75,7 +75,7 @@ class MemcacheProxyClient implements ClientInterface
 	public function sendRequest(
 		$method,
 		$url,
-		$data = array(),
+		$data,
 		$endpoint,
 		AuthenticationInterface $credential,
 		$is_file = false,
