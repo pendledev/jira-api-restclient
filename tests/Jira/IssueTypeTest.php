@@ -4,11 +4,9 @@ namespace Tests\chobie\Jira;
 
 
 use chobie\Jira\IssueType;
-use Yoast\PHPUnitPolyfills\Polyfills\ExpectException;
 
 class IssueTypeTest extends AbstractTestCase
 {
-	use ExpectException;
 
 	public function testHandlesSingleIssueTypeWithAvatarId()
 	{

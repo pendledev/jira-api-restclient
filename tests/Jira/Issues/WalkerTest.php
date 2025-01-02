@@ -10,12 +10,11 @@ use chobie\Jira\Issues\Walker;
 use Prophecy\Prophecy\ObjectProphecy;
 use Tests\chobie\Jira\AbstractTestCase;
 use Yoast\PHPUnitPolyfills\Polyfills\AssertStringContains;
-use Yoast\PHPUnitPolyfills\Polyfills\ExpectException;
 
 class WalkerTest extends AbstractTestCase
 {
 
-	use ExpectException, AssertStringContains;
+	use AssertStringContains;
 
 	/**
 	 * API.
@@ -64,7 +63,7 @@ class WalkerTest extends AbstractTestCase
 	 */
 	protected function captureErrorLog()
 	{
-		return strpos($this->getName(false), 'AnyException') !== false;
+		return strpos($this->getTestName(), 'AnyException') !== false;
 	}
 
 	public function testErrorWithoutJQL()

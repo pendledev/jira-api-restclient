@@ -9,12 +9,9 @@ use chobie\Jira\Api\Authentication\AuthenticationInterface;
 use chobie\Jira\Api\Authentication\Basic;
 use chobie\Jira\Api\Client\ClientInterface;
 use Tests\chobie\Jira\AbstractTestCase;
-use Yoast\PHPUnitPolyfills\Polyfills\ExpectException;
 
 abstract class AbstractClientTestCase extends AbstractTestCase
 {
-
-	use ExpectException;
 
 	/**
 	 * Client.
