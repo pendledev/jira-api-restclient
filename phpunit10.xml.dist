@@ -2,12 +2,11 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
 		 bootstrap="vendor/autoload.php"
 		 backupGlobals="true"
-		 backupStaticAttributes="false"
+		 backupStaticProperties="false"
 		 colors="true"
 		 beStrictAboutTestsThatDoNotTestAnything="true"
 		 beStrictAboutOutputDuringTests="true"
-		 displayDetailsOnTestsThatTriggerDeprecations="true"
-		 verbose="true">
+		 displayDetailsOnTestsThatTriggerDeprecations="true">
 
 	<testsuites>
 		<testsuite name="Jira_Api Test Suite">
