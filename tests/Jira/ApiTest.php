@@ -60,7 +60,7 @@ class ApiTest extends AbstractTestCase
 		$this->assertEquals($used_endpoint, $api->getEndpoint());
 	}
 
-	public function setEndpointDataProvider()
+	public static function setEndpointDataProvider()
 	{
 		return array(
 			'trailing slash removed' => array('https://test.test/', 'https://test.test'),

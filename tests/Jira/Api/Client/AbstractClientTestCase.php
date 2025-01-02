@@ -45,7 +45,7 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 		$this->assertEquals($data, $trace_result['_GET']);
 	}
 
-	public function getRequestWithKnownHttpCodeDataProvider()
+	public static function getRequestWithKnownHttpCodeDataProvider()
 	{
 		return array(
 			'http 200' => array(200),
@@ -133,11 +133,11 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 		);
 	}
 
-	public function fileUploadDataProvider()
+	public static function fileUploadDataProvider()
 	{
 		return array(
-			'default name' => array('file' => __FILE__, 'name' => null),
-			'overridden name' => array('file' => __FILE__, 'name' => 'custom_name.php'),
+			'default name' => array('filename' => __FILE__, 'name' => null),
+			'overridden name' => array('filename' => __FILE__, 'name' => 'custom_name.php'),
 		);
 	}
 
@@ -207,7 +207,7 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 		);
 	}
 
-	public function emptyResponseWithKnownHttpCodeDataProvider()
+	public static function emptyResponseWithKnownHttpCodeDataProvider()
 	{
 		return array(
 			'http 201' => array(201),
