@@ -8,13 +8,13 @@ use chobie\Jira\Api\Authentication\Anonymous;
 use chobie\Jira\Api\Authentication\AuthenticationInterface;
 use chobie\Jira\Api\Authentication\Basic;
 use chobie\Jira\Api\Client\ClientInterface;
+use InvalidArgumentException;
 use Tests\chobie\Jira\AbstractTestCase;
-use Yoast\PHPUnitPolyfills\Polyfills\ExpectException;
+use chobie\Jira\Api\UnauthorizedException;
+use chobie\Jira\Api\Exception;
 
 abstract class AbstractClientTestCase extends AbstractTestCase
 {
-
-	use ExpectException;
 
 	/**
 	 * Client.
@@ -48,7 +48,7 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 		$this->assertEquals($data, $trace_result['_GET']);
 	}
 
-	public function getRequestWithKnownHttpCodeDataProvider()
+	public static function getRequestWithKnownHttpCodeDataProvider()
 	{
 		return array(
 			'http 200' => array(200),
@@ -58,7 +58,7 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 
 	public function testGetRequestError()
 	{
-		$this->expectException('\InvalidArgumentException');
+		$this->expectException(InvalidArgumentException::class);
 		$this->expectExceptionMessage('Data must be an array.');
 
 		$this->traceRequest(Api::REQUEST_GET, 'param1=value1&param2=value2');
@@ -136,31 +136,23 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 		);
 	}
 
-	public function fileUploadDataProvider()
+	public static function fileUploadDataProvider()
 	{
 		return array(
-			'default name' => array('file' => __FILE__, 'name' => null),
-			'overridden name' => array('file' => __FILE__, 'name' => 'custom_name.php'),
+			'default name' => array('filename' => __FILE__, 'name' => null),
+			'overridden name' => array('filename' => __FILE__, 'name' => 'custom_name.php'),
 		);
 	}
 
 	public function testUnsupportedCredentialGiven()
 	{
 		$client_class_parts = explode('\\', get_class($this->client));
-		$credential = $this->prophesize('chobie\Jira\Api\Authentication\AuthenticationInterface')->reveal();
+		$credential = $this->prophesize(AuthenticationInterface::class)->reveal();
 
-		if ( \method_exists($this, 'setExpectedException') ) {
-			$this->setExpectedException(
-				'InvalidArgumentException',
-				end($client_class_parts) . ' does not support ' . get_class($credential) . ' authentication.'
-			);
-		}
-		else {
-			$this->expectException('InvalidArgumentException');
-			$this->expectExceptionMessage(
-				end($client_class_parts) . ' does not support ' . get_class($credential) . ' authentication.'
-			);
-		}
+		$this->expectException('InvalidArgumentException');
+		$this->expectExceptionMessage(
+			end($client_class_parts) . ' does not support ' . get_class($credential) . ' authentication.'
+		);
 
 		$this->client->sendRequest(Api::REQUEST_GET, 'url', array(), 'endpoint', $credential);
 	}
@@ -185,7 +177,7 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 
 	public function testUnauthorizedRequest()
 	{
-		$this->expectException('\chobie\Jira\Api\UnauthorizedException');
+		$this->expectException(UnauthorizedException::class);
 		$this->expectExceptionMessage('Unauthorized');
 
 		$this->traceRequest(Api::REQUEST_GET, array('http_code' => 401));
@@ -193,7 +185,7 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 
 	public function testEmptyResponseWithUnknownHttpCode()
 	{
-		$this->expectException('\chobie\Jira\Api\Exception');
+		$this->expectException(Exception::class);
 		$this->expectExceptionMessage('JIRA Rest server returns unexpected result.');
 
 		$this->traceRequest(Api::REQUEST_GET, array('response_mode' => 'empty'));
@@ -210,7 +202,7 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 		);
 	}
 
-	public function emptyResponseWithKnownHttpCodeDataProvider()
+	public static function emptyResponseWithKnownHttpCodeDataProvider()
 	{
 		return array(
 			'http 201' => array(201),
@@ -246,10 +238,10 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 	/**
 	 * Traces a request.
 	 *
-	 * @param string                        $method     Request method.
-	 * @param array                         $data       Request data.
-	 * @param  AuthenticationInterface|null $credential Credential.
-	 * @param boolean                       $is_file    This is a file upload request.
+	 * @param string                       $method     Request method.
+	 * @param array                        $data       Request data.
+	 * @param AuthenticationInterface|null $credential Credential.
+	 * @param boolean                      $is_file    This is a file upload request.
 	 *
 	 * @return array
 	 */

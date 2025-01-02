@@ -8,6 +8,7 @@ use chobie\Jira\Api\Authentication\AuthenticationInterface;
 use chobie\Jira\Api\Result;
 use chobie\Jira\IssueType;
 use Prophecy\Prophecy\ObjectProphecy;
+use chobie\Jira\Api\Client\ClientInterface;
 
 /**
  * Class ApiTest
@@ -45,8 +46,8 @@ class ApiTest extends AbstractTestCase
 	 */
 	protected function setUpTest()
 	{
-		$this->credential = $this->prophesize('chobie\Jira\Api\Authentication\AuthenticationInterface')->reveal();
-		$this->client = $this->prophesize('chobie\Jira\Api\Client\ClientInterface');
+		$this->credential = $this->prophesize(AuthenticationInterface::class)->reveal();
+		$this->client = $this->prophesize(ClientInterface::class);
 
 		$this->api = new Api(self::ENDPOINT, $this->credential, $this->client->reveal());
 	}
@@ -60,7 +61,7 @@ class ApiTest extends AbstractTestCase
 		$this->assertEquals($used_endpoint, $api->getEndpoint());
 	}
 
-	public function setEndpointDataProvider()
+	public static function setEndpointDataProvider()
 	{
 		return array(
 			'trailing slash removed' => array('https://test.test/', 'https://test.test'),
