@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "068b6c0a91de3e061c8294c30f08e272",
+    "content-hash": "e1f2814f071d8659049fdfc965cbf456",
     "packages": [],
     "packages-dev": [
         {
@@ -52,6 +52,57 @@
                 "source": "https://github.com/aik099/CodingStandard/tree/master"
             },
             "time": "2021-11-07T16:55:51+00:00"
+        },
+        {
+            "name": "console-helpers/prophecy-phpunit",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/console-helpers/prophecy-phpunit.git",
+                "reference": "fe66ace435d1ace4732922283a66e4661c9d3a4d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/console-helpers/prophecy-phpunit/zipball/fe66ace435d1ace4732922283a66e4661c9d3a4d",
+                "reference": "fe66ace435d1ace4732922283a66e4661c9d3a4d",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6 || ^7 || ^8",
+                "phpspec/prophecy": "^1.3",
+                "phpunit/phpunit": "^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Prophecy\\PhpUnit\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christophe Coevoet",
+                    "email": "stof@notk.org"
+                }
+            ],
+            "description": "Integrating the Prophecy mocking library in PHPUnit test cases",
+            "homepage": "http://phpspec.net",
+            "keywords": [
+                "phpunit",
+                "prophecy"
+            ],
+            "support": {
+                "source": "https://github.com/console-helpers/prophecy-phpunit/tree/v3.0.0"
+            },
+            "time": "2024-07-15T12:38:02+00:00"
         },
         {
             "name": "doctrine/instantiator",

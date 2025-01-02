@@ -7,7 +7,6 @@ use chobie\Jira\Api;
 use chobie\Jira\Api\Authentication\AuthenticationInterface;
 use chobie\Jira\Api\Result;
 use chobie\Jira\IssueType;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
@@ -15,7 +14,7 @@ use Prophecy\Prophecy\ObjectProphecy;
  *
  * @package Tests\chobie\Jira
  */
-class ApiTest extends TestCase
+class ApiTest extends AbstractTestCase
 {
 
 	const ENDPOINT = 'http://jira.company.com';

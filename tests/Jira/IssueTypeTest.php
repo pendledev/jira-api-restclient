@@ -4,10 +4,9 @@ namespace Tests\chobie\Jira;
 
 
 use chobie\Jira\IssueType;
-use PHPUnit\Framework\TestCase;
 use Yoast\PHPUnitPolyfills\Polyfills\ExpectException;
 
-class IssueTypeTest extends TestCase
+class IssueTypeTest extends AbstractTestCase
 {
 	use ExpectException;
 

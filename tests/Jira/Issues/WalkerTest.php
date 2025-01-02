@@ -7,12 +7,12 @@ use chobie\Jira\Api\Result;
 use chobie\Jira\Api\UnauthorizedException;
 use chobie\Jira\Issue;
 use chobie\Jira\Issues\Walker;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
+use Tests\chobie\Jira\AbstractTestCase;
 use Yoast\PHPUnitPolyfills\Polyfills\AssertStringContains;
 use Yoast\PHPUnitPolyfills\Polyfills\ExpectException;
 
-class WalkerTest extends TestCase
+class WalkerTest extends AbstractTestCase
 {
 
 	use ExpectException, AssertStringContains;
