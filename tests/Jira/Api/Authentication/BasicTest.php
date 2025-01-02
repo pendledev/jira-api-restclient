@@ -4,9 +4,8 @@ namespace Tests\chobie\Jira;
 
 
 use chobie\Jira\Api\Authentication\Basic;
-use PHPUnit\Framework\TestCase;
 
-class BasicTest extends TestCase
+class BasicTest extends AbstractTestCase
 {
 
 	public function testBasicAuthentication()

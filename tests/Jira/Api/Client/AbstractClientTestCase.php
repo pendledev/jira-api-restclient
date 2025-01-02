@@ -8,10 +8,10 @@ use chobie\Jira\Api\Authentication\Anonymous;
 use chobie\Jira\Api\Authentication\AuthenticationInterface;
 use chobie\Jira\Api\Authentication\Basic;
 use chobie\Jira\Api\Client\ClientInterface;
-use PHPUnit\Framework\TestCase;
+use Tests\chobie\Jira\AbstractTestCase;
 use Yoast\PHPUnitPolyfills\Polyfills\ExpectException;
 
-abstract class AbstractClientTestCase extends TestCase
+abstract class AbstractClientTestCase extends AbstractTestCase
 {
 
 	use ExpectException;
