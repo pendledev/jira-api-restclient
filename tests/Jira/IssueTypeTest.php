@@ -4,6 +4,7 @@ namespace Tests\chobie\Jira;
 
 
 use chobie\Jira\IssueType;
+use Exception;
 
 class IssueTypeTest extends AbstractTestCase
 {
@@ -64,14 +65,14 @@ class IssueTypeTest extends AbstractTestCase
 		);
 		$issue_type = new IssueType($issue_type_source);
 
-		$this->expectException(\Exception::class);
+		$this->expectException(Exception::class);
 		$this->expectExceptionMessage('The "chobie\Jira\IssueType::getUnknown" method does not exist.');
 		$issue_type->getUnknown();
 	}
 
 	public function testCreatingWithUnknownField()
 	{
-		$this->expectException(\Exception::class);
+		$this->expectException(Exception::class);
 		$this->expectExceptionMessage('The "unknown" issue type keys are not supported.');
 
 		$issue_type_source = array(

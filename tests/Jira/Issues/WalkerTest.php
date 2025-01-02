@@ -7,9 +7,11 @@ use chobie\Jira\Api\Result;
 use chobie\Jira\Api\UnauthorizedException;
 use chobie\Jira\Issue;
 use chobie\Jira\Issues\Walker;
+use Exception;
 use Prophecy\Prophecy\ObjectProphecy;
 use Tests\chobie\Jira\AbstractTestCase;
 use Yoast\PHPUnitPolyfills\Polyfills\AssertStringContains;
+use chobie\Jira\Api;
 
 class WalkerTest extends AbstractTestCase
 {
@@ -35,7 +37,7 @@ class WalkerTest extends AbstractTestCase
 	 */
 	protected function setUpTest()
 	{
-		$this->api = $this->prophesize('chobie\Jira\Api');
+		$this->api = $this->prophesize(Api::class);
 
 		if ( $this->captureErrorLog() ) {
 			$this->errorLogFile = tempnam(sys_get_temp_dir(), 'error_log_');
@@ -68,7 +70,7 @@ class WalkerTest extends AbstractTestCase
 
 	public function testErrorWithoutJQL()
 	{
-		$this->expectException('\Exception');
+		$this->expectException(Exception::class);
 		$this->expectExceptionMessage('you have to call Jira_Walker::push($jql, $fields) at first');
 
 		foreach ( $this->createWalker() as $issue ) {
@@ -140,7 +142,7 @@ class WalkerTest extends AbstractTestCase
 
 	public function testUnauthorizedExceptionOnFirstPage()
 	{
-		$this->expectException('\chobie\Jira\Api\UnauthorizedException');
+		$this->expectException(UnauthorizedException::class);
 		$this->expectExceptionMessage('Unauthorized');
 
 		$this->api->search('test jql', 0, 5, 'description')->willThrow(new UnauthorizedException('Unauthorized'));
@@ -155,7 +157,7 @@ class WalkerTest extends AbstractTestCase
 
 	public function testAnyExceptionOnFirstPage()
 	{
-		$this->api->search('test jql', 0, 5, 'description')->willThrow(new \Exception('Anything'));
+		$this->api->search('test jql', 0, 5, 'description')->willThrow(new Exception('Anything'));
 
 		$walker = $this->createWalker(5);
 		$walker->push('test jql', 'description');
@@ -169,7 +171,7 @@ class WalkerTest extends AbstractTestCase
 
 	public function testUnauthorizedExceptionOnSecondPage()
 	{
-		$this->expectException('\chobie\Jira\Api\UnauthorizedException');
+		$this->expectException(UnauthorizedException::class);
 		$this->expectExceptionMessage('Unauthorized');
 
 		// Full 1st page.
@@ -194,7 +196,7 @@ class WalkerTest extends AbstractTestCase
 		$this->api->search('test jql', 0, 5, 'description')->willReturn($search_response1);
 
 		// Incomplete 2nd page.
-		$this->api->search('test jql', 5, 5, 'description')->willThrow(new \Exception('Anything'));
+		$this->api->search('test jql', 5, 5, 'description')->willThrow(new Exception('Anything'));
 
 		$walker = $this->createWalker(5);
 		$walker->push('test jql', 'description');
@@ -208,7 +210,7 @@ class WalkerTest extends AbstractTestCase
 
 	public function testSetDelegateError()
 	{
-		$this->expectException('\Exception');
+		$this->expectException(Exception::class);
 		$this->expectExceptionMessage('passed argument is not callable');
 
 		$walker = $this->createWalker();
