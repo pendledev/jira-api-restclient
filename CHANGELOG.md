@@ -4,6 +4,19 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 ### Added
+...
+
+### Changed
+...
+
+### Removed
+...
+
+### Fixed
+...
+
+## [2.0.0-B1] - 2025-01-04
+### Added
 - Added `Api::getWorklogs` call for getting issue work logs by [@camspanos].
 - Enhance `Api::getCreateMeta` call with ability (optional) to return issue fields by [@arnested].
 - Added `Api::createRemotelink` call for creating linking issue with remote applications by [@elmi82].
@@ -48,9 +61,6 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - The `$method` parameter of the `Api::api` method is now mandatory (previously had `self::REQUEST_GET` value) by [@aik099] (#226).
 - The `$data` parameter of the `ClientInterface::sendRequest` method is now mandatory (previously had `array()` value) by [@aik099] (#226).
 
-### Removed
-...
-
 ### Fixed
 - Attachments created using `PHPClient` were not accessible from JIRA by [@ubermuda] (#59).
 - Inability to create attachment using `CurlClient` on PHP 5.6+ by [@shmaltorhbooks] (#52).
@@ -75,7 +85,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/chobie/jira-api-restclient/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/chobie/jira-api-restclient/compare/v2.0.0-B1...HEAD
+[2.0.0-B1]: https://github.com/chobie/jira-api-restclient/compare/v1.0.0...v2.0.0-B1
 [1.0.0]: https://github.com/chobie/jira-api-restclient/compare/b86f47129509bb27ae11d136fed67b70a27fd3be...v1.0.0
 [@camspanos]: https://github.com/camspanos
 [@arnested]: https://github.com/arnested
