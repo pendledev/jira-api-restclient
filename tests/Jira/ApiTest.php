@@ -152,6 +152,109 @@ class ApiTest extends AbstractTestCase
 		$this->assertFalse($this->api->releaseVersion(111000, $release_date, array('test' => 'extra')));
 	}
 
+	/**
+	 * @dataProvider createRemoteLinkDataProvider
+	 */
+	public function testCreateRemoteLink(array $method_params, array $expected_api_params)
+	{
+		$response = file_get_contents(__DIR__ . '/resources/api_create_remote_link.json');
+
+		$this->expectClientCall(
+			Api::REQUEST_POST,
+			'/rest/api/2/issue/JRE-123/remotelink',
+			$expected_api_params,
+			$response
+		);
+
+		$expected = json_decode($response, true);
+		$actual = call_user_func_array(array($this->api, 'createRemoteLink'), $method_params);
+
+		if ( $actual !== false ) {
+			$this->assertEquals($expected, $actual);
+		}
+	}
+
+	public static function createRemoteLinkDataProvider()
+	{
+		return array(
+			'object only' => array(
+				array(
+					'JRE-123',
+					array(
+						'title' => 'TSTSUP-111',
+						'url' => 'http://www.mycompany.com/support?id=1',
+					),
+				),
+				array(
+					'object' => array(
+						'title' => 'TSTSUP-111',
+						'url' => 'http://www.mycompany.com/support?id=1',
+					),
+				),
+			),
+			'object+relationship' => array(
+				array(
+					'JRE-123',
+					array(
+						'title' => 'TSTSUP-111',
+						'url' => 'http://www.mycompany.com/support?id=1',
+					),
+					'blocked by',
+				),
+				array(
+					'relationship' => 'blocked by',
+					'object' => array(
+						'title' => 'TSTSUP-111',
+						'url' => 'http://www.mycompany.com/support?id=1',
+					),
+				),
+			),
+			'object+global_id' => array(
+				array(
+					'JRE-123',
+					array(
+						'title' => 'TSTSUP-111',
+						'url' => 'http://www.mycompany.com/support?id=1',
+					),
+					null,
+					'global-id',
+				),
+				array(
+					'globalId' => 'global-id',
+					'object' => array(
+						'title' => 'TSTSUP-111',
+						'url' => 'http://www.mycompany.com/support?id=1',
+					),
+				),
+			),
+			'object+application' => array(
+				array(
+					'JRE-123',
+					array(
+						'title' => 'TSTSUP-111',
+						'url' => 'http://www.mycompany.com/support?id=1',
+					),
+					null,
+					null,
+					array(
+						'name' => 'My Acme Tracker',
+						'type' => 'com.acme.tracker',
+					),
+				),
+				array(
+					'object' => array(
+						'title' => 'TSTSUP-111',
+						'url' => 'http://www.mycompany.com/support?id=1',
+					),
+					'application' => array(
+						'name' => 'My Acme Tracker',
+						'type' => 'com.acme.tracker',
+					),
+				),
+			),
+		);
+	}
+
 	public function testFindVersionByName()
 	{
 		$project_key = 'POR';

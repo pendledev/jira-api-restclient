@@ -723,27 +723,25 @@ class Api
 	 * @param string $global_id    Global ID.
 	 * @param array  $application  Application.
 	 *
-	 * @return array|false
+	 * @return array
 	 * @since  2.0.0
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-remote-links/#api-rest-api-2-issue-issueidorkey-remotelink-post
 	 */
 	public function createRemoteLink(
 		$issue_key,
-		array $object = array(),
+		array $object,
 		$relationship = null,
 		$global_id = null,
 		array $application = null
 	) {
-		$options = array(
+		$params = array_filter(array(
 			'globalId' => $global_id,
 			'relationship' => $relationship,
 			'object' => $object,
-		);
+			'application' => $application,
+		));
 
-		if ( $application !== null ) {
-			$options['application'] = $application;
-		}
-
-		return $this->api(self::REQUEST_POST, sprintf('/rest/api/2/issue/%s/remotelink', $issue_key), $options, true);
+		return $this->api(self::REQUEST_POST, sprintf('/rest/api/2/issue/%s/remotelink', $issue_key), $params, true);
 	}
 
 	/**
