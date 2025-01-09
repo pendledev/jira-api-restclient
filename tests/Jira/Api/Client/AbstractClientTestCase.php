@@ -144,6 +144,39 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 		);
 	}
 
+	public function testFileDownloadWithFollowLocation()
+	{
+		$result = $this->client->sendRequest(
+			Api::REQUEST_GET,
+			'/tests/download_attachment.php?download_url=' . rtrim($_SERVER['REPO_URL'], '/') . '/LICENSE.md',
+			array(),
+			rtrim($_SERVER['REPO_URL'], '/'),
+			new Basic('user1', 'pass1'),
+			true
+		);
+
+		$this->assertStringEqualsFile(
+			$this->getProjectRoot() . '/LICENSE.md',
+			$result
+		);
+	}
+
+	/**
+	 * Returns project root.
+	 *
+	 * @return string
+	 */
+	protected function getProjectRoot()
+	{
+		$dir = __DIR__;
+
+		while ( !file_exists($dir . '/LICENSE.md') ) {
+			$dir = dirname($dir);
+		}
+
+		return $dir;
+	}
+
 	public function testUnsupportedCredentialGiven()
 	{
 		$client_class_parts = explode('\\', get_class($this->client));

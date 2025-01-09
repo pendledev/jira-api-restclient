@@ -97,6 +97,7 @@ class CurlClient implements ClientInterface
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
 		curl_setopt($curl, CURLOPT_VERBOSE, $debug);
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
 
 		if ( $is_file ) {
 			if ( defined('CURLOPT_SAFE_UPLOAD') && PHP_VERSION_ID < 70000 ) {
