@@ -43,7 +43,7 @@ jobs:
             phpunit_config: 'phpunit10.xml.dist' # PHPUnit 10.5
       fail-fast: false
     env:
-      REPO_URL: http://localhost:8002/
+      REPO_URL: https://localhost/
 
     steps:
       - name: Checkout
@@ -70,9 +70,34 @@ jobs:
         with:
           dependency-versions: "highest"
 
+      - name: Create a temporary folder
+        run: |
+            mkdir build
+
+      - name: Install mkcert
+        run: |
+          sudo apt-get update
+          sudo apt-get install libnss3-tools
+          cd build
+          curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64"
+          chmod +x mkcert-v*-linux-amd64
+          sudo cp mkcert-v*-linux-amd64 /usr/local/bin/mkcert
+
+      - name: Generate an SSL certificate
+        run: |
+          cd build
+          mkcert -install
+          mkcert -key-file key.pem -cert-file cert.pem localhost 127.0.0.1 ::1
+
       - name: Setup test web server
         run: |
           php -S localhost:8002 -t $(pwd) > /dev/null 2> /tmp/webserver_output.txt &
+
+      - name: Setup Nginx
+        run: |
+          sudo chmod o+w /etc/nginx/sites-available/default 
+          sudo cat tests/nginx_vhost_config > /etc/nginx/sites-available/default
+          sudo systemctl restart nginx.service
 
       - name: Wait for browser & PHP to start
         run: |
