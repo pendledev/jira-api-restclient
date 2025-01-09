@@ -29,6 +29,7 @@ namespace chobie\Jira;
 use chobie\Jira\Api\Authentication\AuthenticationInterface;
 use chobie\Jira\Api\Client\ClientInterface;
 use chobie\Jira\Api\Client\CurlClient;
+use chobie\Jira\Api\Exception;
 use chobie\Jira\Api\Result;
 
 class Api
@@ -802,23 +803,29 @@ class Api
 	/**
 	 * Downloads attachment.
 	 *
-	 * @param string $url URL.
+	 * @param string $url URL in "https://your-jira-project.net/rest/api/2/attachment/content/{id}" format.
 	 *
 	 * @return array|string
+	 * @throws Exception When a download URL is coming from a different Jira instance.
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-attachments/#api-rest-api-2-attachment-content-id-get
 	 */
 	public function downloadAttachment($url)
 	{
-		$result = $this->client->sendRequest(
+		$relative_url = preg_replace('/^' . preg_quote($this->getEndpoint(), '/') . '/', '', $url);
+
+		if ( $relative_url === $url ) {
+			throw new Exception('The download url is coming from the different Jira instance.');
+		}
+
+		return $this->client->sendRequest(
 			self::REQUEST_GET,
-			$url,
+			$relative_url,
 			array(),
-			null,
+			$this->getEndpoint(),
 			$this->authentication,
 			true,
-			false
+			false // Needed for test suite to work (probably Prophecy glitch).
 		);
-
-		return $result;
 	}
 
 	/**

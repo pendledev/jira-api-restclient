@@ -122,8 +122,9 @@ class PHPClient implements ClientInterface
 			'http' => array(
 				'method' => $method,
 				'header' => implode("\r\n", $header),
-				'ignore_errors' => true,
+				'ignore_errors' => true, // Not needed since PHP 5.1.0.
 				'protocol_version' => 1.1, // Not needed since PHP 8.0.
+				'follow_location' => 1, // Not needed since PHP 5.1.0.
 			),
 		);
 

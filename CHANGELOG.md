@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ...
 
 ### Changed
-...
+- The `Api::downloadAttachment` method now throws an exception, when attempting to download from a non-Jira website by [@aik099] (#240).
 
 ### Removed
 ...
@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixed
 - The `CurlClient` in combination with cURL version < 7.33.0 was getting `426 Upgrade Required` error on any request to the Atlassian Cloud servers by [@aik099] (#239).
 - The `PHPClient` on PHP < 8.0 was getting `426 Upgrade Required` error on any request to the Atlassian Cloud servers by [@aik099] (#239).
+- The `Api::downloadAttachment` method wasn't working with `CurlClient` for Atlassian Cloud servers by [@aik099] (#240).
 
 ## [2.0.0-B1] - 2025-01-04
 ### Added

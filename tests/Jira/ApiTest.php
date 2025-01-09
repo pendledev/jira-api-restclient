@@ -5,6 +5,7 @@ namespace Tests\chobie\Jira;
 
 use chobie\Jira\Api;
 use chobie\Jira\Api\Authentication\AuthenticationInterface;
+use chobie\Jira\Api\Exception;
 use chobie\Jira\Api\Result;
 use chobie\Jira\IssueType;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -150,6 +151,33 @@ class ApiTest extends AbstractTestCase
 		);
 
 		$this->assertFalse($this->api->releaseVersion(111000, $release_date, array('test' => 'extra')));
+	}
+
+	public function testDownloadAttachmentSuccessful()
+	{
+		$expected = 'file content';
+
+		$this->expectClientCall(
+			Api::REQUEST_GET,
+			'/rest/api/2/attachment/content/12345',
+			array(),
+			$expected,
+			true
+		);
+
+		$actual = $this->api->downloadAttachment(self::ENDPOINT . '/rest/api/2/attachment/content/12345');
+
+		if ( $actual !== null ) {
+			$this->assertEquals($expected, $actual);
+		}
+	}
+
+	public function testDownloadAttachmentWithException()
+	{
+		$this->expectException(Exception::class);
+		$this->expectExceptionMessage('The download url is coming from the different Jira instance.');
+
+		$this->api->downloadAttachment('https://other.jira-instance.com/rest/api/2/attachment/content/12345');
 	}
 
 	/**
