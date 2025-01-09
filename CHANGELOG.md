@@ -13,7 +13,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ...
 
 ### Fixed
-...
+- The `CurlClient` in combination with cURL version < 7.33.0 was getting `426 Upgrade Required` error on any request to the Atlassian Cloud servers by [@aik099] (#239).
+- The `PHPClient` on PHP < 8.0 was getting `426 Upgrade Required` error on any request to the Atlassian Cloud servers by [@aik099] (#239).
 
 ## [2.0.0-B1] - 2025-01-04
 ### Added
