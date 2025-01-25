@@ -21,27 +21,13 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [2.0.0-B1] - 2025-01-04
 ### Added
-- Added `Api::getWorklogs` call for getting issue work logs by [@camspanos].
-- Enhance `Api::getCreateMeta` call with ability (optional) to return issue fields by [@arnested].
-- Added `Api::createRemotelink` call for creating linking issue with remote applications by [@elmi82].
-- Added `Api::findVersionByName` call for getting project version information by it's name by [@jpastoor].
-- Added `Api::updateVersion` call for editing version by [@jpastoor].
-- Added `Api::releaseVersion` call for marking version as released by [@jpastoor].
-- Added `Api::getAttachmentsMetaInformation` call for getting attachments meta information by [@N-M].
-- Added `Api::getProjectComponents` call for getting project components by [@N-M].
-- Added `Api::getProjectIssueTypes` call for getting project issue types and issue statuses connected to them by [@N-M].
-- Added `Api::getResolutions` call for getting available issue resolutions by [@N-M].
-- Allow configuring issues queried per page in `Walker` class by [@aik099].
-- Added optional override for the filename in `Api::createAttachment` by [@betterphp]
-- Allow getting issue count back from `Walker` class by [@aik099].
-- Setup `.gitattributes` for better `CHANGELOG.md` merging by [@glensc].
-- Added `Api::addWorklog` and `Api::deleteWorklog` calls for more control over the work logs [@dumconstantin] and [@aik099].
+- Added `Api::addWorklog` and `Api::deleteWorklog` calls for more control over the work logs [@dumconstantin] and [@aik099] (#219).
 - Added `Api::getWorklogs` call for getting issue work logs by [@camspanos] (#37).
 - Added `Api::createRemotelink` call for linking issue with its remote applications by [@elmi82] (#43).
 - Added `Api::findVersionByName` call for getting project version information by its name by [@jpastoor] (#82).
-- Added `Api::updateVersion` call for editing version by [@jpastoor] (#82).
-- Added `Api::releaseVersion` call for marking version as released by [@jpastoor] (#82).
-- Added `Api::getAttachmentsMetaInformation` call for getting attachments meta information by [@N-M] (#101).
+- Added `Api::updateVersion` call for editing a version by [@jpastoor] (#82).
+- Added `Api::releaseVersion` call for marking a version as released by [@jpastoor] (#82).
+- Added `Api::getAttachmentsMetaInformation` call for getting attachments meta-information by [@N-M] (#101).
 - Added `Api::getProjectComponents` call for getting project components by [@N-M] (#104).
 - Added `Api::getProjectIssueTypes` call for getting project issue types and issue statuses connected to them by [@N-M] (#104).
 - Added `Api::getResolutions` call for getting available issue resolutions by [@N-M] (#104).
@@ -55,8 +41,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Minimal supported PHP version changed from 5.2 to 5.3 by [@chobie] (#21).
 - The `Api::getPriorties` renamed into `Api::getPriorities` by [@josevh] and [@jpastoor] (#68).
 - The `Api::setEndPoint` now also removes trailing slash from the given url by [@Procta] (#67).
-- Added local cache to getResolutions by [@jpastoor] (#131).
-- Renamed Api::api() parameter `$return_as_json` to `$return_as_array` by [@jpastoor] (#134).
+- Added local cache to `Api::getResolutions` by [@jpastoor] (#131).
+- Renamed `Api::api` parameter `$return_as_json` to `$return_as_array` by [@jpastoor] (#134).
 - Renamed `Api::createRemotelink` to `Api::createRemoteLink` by [@glensc] (#183).
 - The `CurlClient::sendRequest` is throwing exception, when `$data` parameter isn't an array and `$method` is GET by [@alopex06] (#100).
 - Minimal supported PHP version changed from 5.3 to 5.6 by [@aik099] (#207).
@@ -77,12 +63,12 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Clearing local caches (statuses, priorities, fields and resolutions) on endpoint change by [@jpastoor] (#131).
 - Error details from failed API calls were not available back from `Api::api method` call by [@betterphp] (#140).
 - Warning about `count()` function usage on PHP 7.2, when searching for issues by [@aik099] (#174).
-- The `Api::createRemotelink` wasn't updating an existing remote link, because given `$global_id` parameter was incorrectly passed to the Jira by  [@glensc] (#178).
+- The `Api::createRemotelink` wasn't updating an existing remote link, because given `$global_id` parameter was incorrectly passed to the Jira by [@glensc] (#178).
 - The `Api::getIssueTypes` was always returning an error, because `entityId`, `hierarchyLevel` and `untranslatedName` issue type properties weren't supported by [@aik099] (#208).
 - The `PHPClient` was sending wrong `Content-Type` header for GET requests by [@aik099] (#108).
 - Attempt to make a `DELETE` API call using `PHPClient` wasn't working by [@aik099] (#108).
 - The `PHPClient` thrown exceptions weren't inline with `CurlClient` thrown exceptions by [@aik099] (#108).
-- Fixed the `CurlClient` inability to perform an SSL connection from macOS due to locked HTTP protocol version by [@benPesso] (#147).
+- Fixed the `CurlClient` inability to perform an SSL connection from macOS due to a locked HTTP protocol version by [@benPesso] (#147).
 - The `Api::getIssueTypes` method was always throwing an error due to `scope` issue type parameter wasn't supported by [@danillofb] (#181).
 
 ## [1.0.0] - 2014-07-27
