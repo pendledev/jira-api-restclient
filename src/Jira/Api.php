@@ -178,20 +178,20 @@ class Api
 	 * Get fields definitions.
 	 *
 	 * @return array
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-fields/#api-rest-api-2-field-get
 	 */
 	public function getFields()
 	{
 		// Fetch fields when the method is called for the first time.
 		if ( $this->fields === null ) {
-			$fields = array();
-			$result = $this->api(self::REQUEST_GET, '/rest/api/2/field', array(), true);
+			$ret = array();
+			$fields = $this->api(self::REQUEST_GET, '/rest/api/2/field', array(), true);
 
-			/* set hash key as custom field id */
-			foreach ( $result as $field ) {
-				$fields[$field['id']] = $field;
+			foreach ( $fields as $field_data ) {
+				$ret[$field_data['id']] = $field_data;
 			}
 
-			$this->fields = $fields;
+			$this->fields = $ret;
 		}
 
 		return $this->fields;
@@ -203,11 +203,18 @@ class Api
 	 * @param string $issue_key Issue key should be "YOURPROJ-221".
 	 * @param string $expand    Expand.
 	 *
-	 * @return Result|false
+	 * @return Result
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-get
 	 */
 	public function getIssue($issue_key, $expand = '')
 	{
-		return $this->api(self::REQUEST_GET, sprintf('/rest/api/2/issue/%s', $issue_key), array('expand' => $expand));
+		$params = array();
+
+		if ( $expand !== '' ) {
+			$params['expand'] = $expand;
+		}
+
+		return $this->api(self::REQUEST_GET, sprintf('/rest/api/2/issue/%s', $issue_key), $params);
 	}
 
 	/**
@@ -217,6 +224,7 @@ class Api
 	 * @param array  $params    Params.
 	 *
 	 * @return Result|false
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-put
 	 */
 	public function editIssue($issue_key, array $params)
 	{
@@ -273,7 +281,8 @@ class Api
 	 *
 	 * @param string $project_key Project key.
 	 *
-	 * @return array|false
+	 * @return array
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-project-roles/#api-rest-api-2-role-get
 	 */
 	public function getRoles($project_key)
 	{
@@ -283,8 +292,8 @@ class Api
 	/**
 	 * Returns role details.
 	 *
-	 * @param string $project_key Project key.
-	 * @param string $role_id     Role ID.
+	 * @param string  $project_key Project key.
+	 * @param integer $role_id     Role ID.
 	 *
 	 * @return array|false
 	 */
@@ -322,7 +331,8 @@ class Api
 	 *                                an issue type that does not exist is not an error.
 	 * @param array $expand           Optional list of entities to expand in the response.
 	 *
-	 * @return array|false
+	 * @return array
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-createmeta-get
 	 */
 	public function getCreateMeta(
 		array $project_ids = null,
@@ -331,7 +341,7 @@ class Api
 		array $issue_type_names = null,
 		array $expand = null
 	) {
-		// Create comma separated query parameters for the supplied filters.
+		// Create comma-separated query parameters for the supplied filters.
 		$data = array();
 
 		if ( $project_ids !== null ) {
@@ -413,7 +423,7 @@ class Api
 	 * @return Result|false
 	 * @since  2.0.0
 	 */
-	public function getWorklogs($issue_key, array $params)
+	public function getWorklogs($issue_key, array $params = array())
 	{
 		return $this->api(self::REQUEST_GET, sprintf('/rest/api/2/issue/%s/worklog', $issue_key), $params);
 	}
@@ -445,8 +455,9 @@ class Api
 	 * @param array  $params    Params.
 	 *
 	 * @return Result|false
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-issueidorkey-transitions-get
 	 */
-	public function getTransitions($issue_key, array $params)
+	public function getTransitions($issue_key, array $params = array())
 	{
 		return $this->api(self::REQUEST_GET, sprintf('/rest/api/2/issue/%s/transitions', $issue_key), $params);
 	}
@@ -468,17 +479,18 @@ class Api
 	 * Get available issue types.
 	 *
 	 * @return IssueType[]
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-types/#api-rest-api-2-issuetype-get
 	 */
 	public function getIssueTypes()
 	{
-		$result = array();
-		$types = $this->api(self::REQUEST_GET, '/rest/api/2/issuetype', array(), true);
+		$ret = array();
+		$issue_types = $this->api(self::REQUEST_GET, '/rest/api/2/issuetype', array(), true);
 
-		foreach ( $types as $issue_type ) {
-			$result[] = new IssueType($issue_type);
+		foreach ( $issue_types as $issue_type_data ) {
+			$ret[] = new IssueType($issue_type_data);
 		}
 
-		return $result;
+		return $ret;
 	}
 
 	/**
@@ -486,7 +498,8 @@ class Api
 	 *
 	 * @param string $project_key Project key.
 	 *
-	 * @return array|false
+	 * @return array
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-project-versions/#api-rest-api-2-project-projectidorkey-versions-get
 	 */
 	public function getVersions($project_key)
 	{
@@ -507,6 +520,11 @@ class Api
 		// Fetch all versions of this project.
 		$versions = $this->getVersions($project_key);
 
+		// Don't iterate versions, when API call ended with an error.
+		if ( array_key_exists('errorMessages', $versions) || array_key_exists('errors', $versions) ) {
+			return null;
+		}
+
 		// Filter results on the name.
 		$matching_versions = array_filter($versions, function (array $version) use ($name) {
 			return $version['name'] == $name;
@@ -517,7 +535,7 @@ class Api
 			return null;
 		}
 
-		// Multiple results should not happen since name is unique.
+		// Multiple results should not happen since the name is unique.
 		return reset($matching_versions);
 	}
 
@@ -525,21 +543,21 @@ class Api
 	 * Get available priorities.
 	 *
 	 * @return array
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-priorities/#api-rest-api-2-priority-get
 	 * @since  2.0.0
 	 */
 	public function getPriorities()
 	{
 		// Fetch priorities when the method is called for the first time.
 		if ( $this->priorities === null ) {
-			$priorities = array();
-			$result = $this->api(self::REQUEST_GET, '/rest/api/2/priority', array(), true);
+			$ret = array();
+			$priorities = $this->api(self::REQUEST_GET, '/rest/api/2/priority', array(), true);
 
-			/* set hash key as custom field id */
-			foreach ( $result as $priority ) {
-				$priorities[$priority['id']] = $priority;
+			foreach ( $priorities as $priority_data ) {
+				$ret[$priority_data['id']] = $priority_data;
 			}
 
-			$this->priorities = $priorities;
+			$this->priorities = $ret;
 		}
 
 		return $this->priorities;
@@ -549,20 +567,20 @@ class Api
 	 * Get available statuses.
 	 *
 	 * @return array
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-status/#api-rest-api-2-statuses-get
 	 */
 	public function getStatuses()
 	{
 		// Fetch statuses when the method is called for the first time.
 		if ( $this->statuses === null ) {
-			$statuses = array();
-			$result = $this->api(self::REQUEST_GET, '/rest/api/2/status', array(), true);
+			$ret = array();
+			$statuses = $this->api(self::REQUEST_GET, '/rest/api/2/status', array(), true);
 
-			/* set hash key as custom field id */
-			foreach ( $result as $status ) {
-				$statuses[$status['id']] = $status;
+			foreach ( $statuses as $status_data ) {
+				$ret[$status_data['id']] = $status_data;
 			}
 
-			$this->statuses = $statuses;
+			$this->statuses = $ret;
 		}
 
 		return $this->statuses;
@@ -571,16 +589,17 @@ class Api
 	/**
 	 * Creates an issue.
 	 *
-	 * @param string $project_key Project key.
-	 * @param string $summary     Summary.
-	 * @param string $issue_type  Issue type.
-	 * @param array  $options     Options.
+	 * @param string $project_key  Project key.
+	 * @param string $summary      Summary.
+	 * @param string $issue_type   Issue type.
+	 * @param array  $other_fields Other fields.
 	 *
 	 * @return Result|false
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-post
 	 */
-	public function createIssue($project_key, $summary, $issue_type, array $options = array())
+	public function createIssue($project_key, $summary, $issue_type, array $other_fields = array())
 	{
-		$default = array(
+		$default_fields = array(
 			'project' => array(
 				'key' => $project_key,
 			),
@@ -590,9 +609,9 @@ class Api
 			),
 		);
 
-		$default = array_merge($default, $options);
+		$fields = array_merge($default_fields, $other_fields);
 
-		return $this->api(self::REQUEST_POST, '/rest/api/2/issue/', array('fields' => $default));
+		return $this->api(self::REQUEST_POST, '/rest/api/2/issue', array('fields' => $fields));
 	}
 
 	/**
@@ -603,7 +622,8 @@ class Api
 	 * @param integer $max_results Max results.
 	 * @param string  $fields      Fields.
 	 *
-	 * @return Result|false
+	 * @return Result
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-search/#api-rest-api-2-search-get
 	 */
 	public function search($jql, $start_at = 0, $max_results = 20, $fields = '*navigable')
 	{
@@ -626,26 +646,23 @@ class Api
 	 *
 	 * @param string $project_key Project key.
 	 * @param string $version     Version.
-	 * @param array  $options     Options.
+	 * @param array  $params      Params.
 	 *
-	 * @return Result|false
+	 * @return Result
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-project-versions/#api-rest-api-2-version-post
 	 */
-	public function createVersion($project_key, $version, array $options = array())
+	public function createVersion($project_key, $version, array $params = array())
 	{
-		$options = array_merge(
+		$params = array_merge(
 			array(
 				'name' => $version,
-				'description' => '',
 				'project' => $project_key,
-				// 'userReleaseDate' => '',
-				// 'releaseDate' => '',
-				'released' => false,
 				'archived' => false,
 			),
-			$options
+			$params
 		);
 
-		return $this->api(self::REQUEST_POST, '/rest/api/2/version', $options);
+		return $this->api(self::REQUEST_POST, '/rest/api/2/version', $params);
 	}
 
 	/**
@@ -654,9 +671,9 @@ class Api
 	 * @param integer $version_id Version ID.
 	 * @param array   $params     Key->Value list to update the version with.
 	 *
-	 * @return false
+	 * @return Result
 	 * @since  2.0.0
-	 * @link   https://docs.atlassian.com/jira/REST/latest/#api/2/version-updateVersion
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-project-versions/#api-rest-api-2-version-id-put
 	 */
 	public function updateVersion($version_id, array $params = array())
 	{
@@ -670,7 +687,7 @@ class Api
 	 * @param string|null $release_date Date in Y-m-d format (defaults to today).
 	 * @param array       $params       Optionally extra parameters.
 	 *
-	 * @return false
+	 * @return Result
 	 * @since  2.0.0
 	 */
 	public function releaseVersion($version_id, $release_date = null, array $params = array())
@@ -698,18 +715,19 @@ class Api
 	 * @param string $name      Name.
 	 *
 	 * @return Result|false
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-attachments/#api-rest-api-2-issue-issueidorkey-attachments-post
 	 */
 	public function createAttachment($issue_key, $filename, $name = null)
 	{
-		$options = array(
+		$params = array(
 			'file' => '@' . $filename,
-			'name' => $name,
+			'name' => $name, // The NULL value is handled in the "ClientInterface" implementing class.
 		);
 
 		return $this->api(
 			self::REQUEST_POST,
 			sprintf('/rest/api/2/issue/%s/attachments', $issue_key),
-			$options,
+			$params,
 			false,
 			true
 		);
@@ -861,7 +879,7 @@ class Api
 	 * @param string $issue_key Issue key.
 	 * @param array  $watchers  Watchers.
 	 *
-	 * @return Result|false
+	 * @return (Result|false)[]
 	 */
 	public function setWatchers($issue_key, array $watchers)
 	{
@@ -884,28 +902,26 @@ class Api
 	 */
 	public function closeIssue($issue_key)
 	{
-		$result = array();
-
 		// Get available transitions.
-		$tmp_transitions = $this->getTransitions($issue_key, array());
-		$tmp_transitions_result = $tmp_transitions->getResult();
+		$tmp_transitions_result = $this->getTransitions($issue_key)->getResult();
 		$transitions = $tmp_transitions_result['transitions'];
 
 		// Look for "Close Issue" transition in issue transitions.
-		foreach ( $transitions as $v ) {
-			// Close issue if required id was found.
-			if ( $v['name'] == 'Close Issue' ) {
-				$result = $this->transition(
-					$issue_key,
-					array(
-						'transition' => array('id' => $v['id']),
-					)
-				);
-				break;
+		foreach ( $transitions as $transition_data ) {
+			if ( $transition_data['name'] !== 'Close Issue' ) {
+				continue;
 			}
+
+			// Close issue if required id was found.
+			return $this->transition(
+				$issue_key,
+				array(
+					'transition' => array('id' => $transition_data['id']),
+				)
+			);
 		}
 
-		return $result;
+		return array();
 	}
 
 	/**
@@ -914,6 +930,7 @@ class Api
 	 * @param string $project_key Project key.
 	 *
 	 * @return array
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-project-components/#api-rest-api-2-project-projectidorkey-components-get
 	 * @since  2.0.0
 	 */
 	public function getProjectComponents($project_key)
@@ -927,6 +944,7 @@ class Api
 	 * @param string $project_key Project key.
 	 *
 	 * @return array
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-projects/#api-rest-api-2-project-projectidorkey-statuses-get
 	 * @since  2.0.0
 	 */
 	public function getProjectIssueTypes($project_key)
@@ -938,20 +956,21 @@ class Api
 	 * Returns a list of all resolutions.
 	 *
 	 * @return array
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-resolutions/#api-rest-api-2-resolution-get
 	 * @since  2.0.0
 	 */
 	public function getResolutions()
 	{
 		// Fetch resolutions when the method is called for the first time.
 		if ( $this->resolutions === null ) {
-			$resolutions = array();
-			$result = $this->api(self::REQUEST_GET, '/rest/api/2/resolution', array(), true);
+			$ret = array();
+			$resolutions = $this->api(self::REQUEST_GET, '/rest/api/2/resolution', array(), true);
 
-			foreach ( $result as $resolution ) {
-				$resolutions[$resolution['id']] = $resolution;
+			foreach ( $resolutions as $resolution_data ) {
+				$ret[$resolution_data['id']] = $resolution_data;
 			}
 
-			$this->resolutions = $resolutions;
+			$this->resolutions = $ret;
 		}
 
 		return $this->resolutions;

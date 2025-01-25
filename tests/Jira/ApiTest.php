@@ -4,54 +4,16 @@ namespace Tests\chobie\Jira;
 
 
 use chobie\Jira\Api;
-use chobie\Jira\Api\Authentication\AuthenticationInterface;
-use chobie\Jira\Api\Exception;
 use chobie\Jira\Api\Result;
 use chobie\Jira\IssueType;
-use Prophecy\Prophecy\ObjectProphecy;
-use chobie\Jira\Api\Client\ClientInterface;
 
 /**
  * Class ApiTest
  *
  * @package Tests\chobie\Jira
  */
-class ApiTest extends AbstractTestCase
+class ApiTest extends AbstractApiTestCase
 {
-
-	const ENDPOINT = 'http://jira.company.com';
-
-	/**
-	 * Api.
-	 *
-	 * @var Api
-	 */
-	protected $api;
-
-	/**
-	 * Credential.
-	 *
-	 * @var AuthenticationInterface
-	 */
-	protected $credential;
-
-	/**
-	 * Client.
-	 *
-	 * @var ObjectProphecy
-	 */
-	protected $client;
-
-	/**
-	 * @before
-	 */
-	protected function setUpTest()
-	{
-		$this->credential = $this->prophesize(AuthenticationInterface::class)->reveal();
-		$this->client = $this->prophesize(ClientInterface::class);
-
-		$this->api = new Api(self::ENDPOINT, $this->credential, $this->client->reveal());
-	}
 
 	/**
 	 * @dataProvider setEndpointDataProvider
@@ -79,105 +41,44 @@ class ApiTest extends AbstractTestCase
 			'/rest/api/2/search',
 			array(
 				'jql' => 'test',
-				'startAt' => 0,
+				'startAt' => 5,
 				'maxResults' => 2,
 				'fields' => 'description',
 			),
 			$response
 		);
 
-		$response_decoded = json_decode($response, true);
-
-		// Field auto-expanding would trigger this call.
-		$this->expectClientCall(
-			Api::REQUEST_GET,
-			'/rest/api/2/field',
-			array(),
-			file_get_contents(__DIR__ . '/resources/api_field.json')
+		$this->assertApiResponse(
+			$response,
+			$this->api->search('test', 5, 2, 'description')
 		);
-
-		$this->assertEquals(new Result($response_decoded), $this->api->search('test', 0, 2, 'description'));
 	}
 
-	public function testUpdateVersion()
+	public function testSetWatchers()
 	{
-		$params = array(
-			'overdue' => true,
-			'description' => 'new description',
-		);
+		$errored_response = '{"errorMessages":[],"errors":{}}';
 
 		$this->expectClientCall(
-			Api::REQUEST_PUT,
-			'/rest/api/2/version/111000',
-			$params,
-			''
+			Api::REQUEST_POST,
+			'/rest/api/2/issue/JRE-123/watchers',
+			'account-id-one',
+			'' // For successful operation an empty string is returned.
 		);
-
-		$this->assertFalse($this->api->updateVersion(111000, $params));
-	}
-
-	public function testReleaseVersionAutomaticReleaseDate()
-	{
-		$params = array(
-			'released' => true,
-			'releaseDate' => date('Y-m-d'),
-		);
-
 		$this->expectClientCall(
-			Api::REQUEST_PUT,
-			'/rest/api/2/version/111000',
-			$params,
-			''
+			Api::REQUEST_POST,
+			'/rest/api/2/issue/JRE-123/watchers',
+			'account-id-two',
+			$errored_response // For a failed operation an error list is returned.
 		);
 
-		$this->assertFalse($this->api->releaseVersion(111000));
-	}
-
-	public function testReleaseVersionParameterMerging()
-	{
-		$release_date = '2010-07-06';
-
-		$expected_params = array(
-			'released' => true,
-			'releaseDate' => $release_date,
-			'test' => 'extra',
+		// Can't use "assertSame" due to objected, but "assertEquals" would consider "false" and "" the same.
+		$this->assertEquals(
+			array(
+				false,
+				new Result(json_decode($errored_response, true)),
+			),
+			$this->api->setWatchers('JRE-123', array('account-id-one', 'account-id-two'))
 		);
-
-		$this->expectClientCall(
-			Api::REQUEST_PUT,
-			'/rest/api/2/version/111000',
-			$expected_params,
-			''
-		);
-
-		$this->assertFalse($this->api->releaseVersion(111000, $release_date, array('test' => 'extra')));
-	}
-
-	public function testDownloadAttachmentSuccessful()
-	{
-		$expected = 'file content';
-
-		$this->expectClientCall(
-			Api::REQUEST_GET,
-			'/rest/api/2/attachment/content/12345',
-			array(),
-			$expected,
-			true
-		);
-
-		$actual = $this->api->downloadAttachment(self::ENDPOINT . '/rest/api/2/attachment/content/12345');
-
-		if ( $actual !== null ) {
-			$this->assertEquals($expected, $actual);
-		}
-	}
-
-	public function testDownloadAttachmentWithException()
-	{
-		$this->expectException(Exception::class);
-		$this->expectExceptionMessage('The download url is coming from the different Jira instance.');
-
-		$this->api->downloadAttachment('https://other.jira-instance.com/rest/api/2/attachment/content/12345');
 	}
 
 	/**
@@ -283,33 +184,145 @@ class ApiTest extends AbstractTestCase
 		);
 	}
 
-	public function testFindVersionByName()
+	public function testFalseOnEmptyResponse()
 	{
-		$project_key = 'POR';
-		$version_id = '14206';
-		$version_name = '3.36.0';
-
-		$versions = array(
-			array('id' => '14205', 'name' => '3.62.0'),
-			array('id' => $version_id, 'name' => $version_name),
-			array('id' => '14207', 'name' => '3.66.0'),
-		);
-
 		$this->expectClientCall(
 			Api::REQUEST_GET,
-			'/rest/api/2/project/' . $project_key . '/versions',
+			'/rest/api/2/something',
 			array(),
-			json_encode($versions)
+			''
+		);
+
+		$this->assertFalse($this->api->api(api::REQUEST_GET, '/rest/api/2/something'));
+	}
+
+	public function testResponseIsJsonDecodedIntoArray()
+	{
+		$this->expectClientCall(
+			Api::REQUEST_GET,
+			'/rest/api/2/something',
+			array(),
+			'{"key":"value"}'
 		);
 
 		$this->assertEquals(
-			array('id' => $version_id, 'name' => $version_name),
-			$this->api->findVersionByName($project_key, $version_name),
-			'Version found'
+			array('key' => 'value'),
+			$this->api->api(api::REQUEST_GET, '/rest/api/2/something', array(), true)
+		);
+	}
+
+	public function testResponseIsJsonDecodedIntoResultObject()
+	{
+		$this->expectClientCall(
+			Api::REQUEST_GET,
+			'/rest/api/2/something',
+			array(),
+			'{"key":"value"}'
 		);
 
-		$this->assertNull(
-			$this->api->findVersionByName($project_key, 'i_do_not_exist')
+		$this->assertEquals(
+			new Result(array('key' => 'value')),
+			$this->api->api(api::REQUEST_GET, '/rest/api/2/something')
+		);
+	}
+
+	/**
+	 * @dataProvider responseAutomappingDataProvider
+	 */
+	public function testResponseAutomapping($options, $jira_response, array $expected_response)
+	{
+		$this->expectClientCall(
+			Api::REQUEST_GET,
+			'/rest/api/2/something',
+			array(),
+			$jira_response
+		);
+
+		// Field auto-expanding would trigger this call.
+		if ( $options === Api::AUTOMAP_FIELDS ) {
+			$decoded_field_response = array(
+				array(
+					'id' => 'title',
+					'name' => 'Заголовок',
+				),
+				array(
+					'id' => 'description',
+					'name' => 'Описание',
+				),
+			);
+			$this->expectClientCall(
+				Api::REQUEST_GET,
+				'/rest/api/2/field',
+				array(),
+				json_encode($decoded_field_response)
+			);
+		}
+
+		$this->api->setOptions($options);
+
+		$this->assertEquals(
+			$expected_response,
+			$this->api->api(api::REQUEST_GET, '/rest/api/2/something', array(), true)
+		);
+	}
+
+	public static function responseAutomappingDataProvider()
+	{
+		$decoded_issues_response = array(
+			'issues' => array(
+				array(
+					'fields' => array(
+						'title' => 'sample title 1',
+						'description' => 'sample description 1',
+						'issuetype' => array(
+							'self' => 'https://test.atlassian.net/rest/api/2/issuetype/10034',
+						),
+					),
+				),
+				array(
+					'fields' => array(
+						'title' => 'sample title 2',
+						'description' => 'sample description 2',
+						'issuetype' => array(
+							'self' => 'https://test.atlassian.net/rest/api/2/issuetype/10035',
+						),
+					),
+				),
+			),
+		);
+
+		return array(
+			'auto-map' => array(
+				Api::AUTOMAP_FIELDS,
+				json_encode($decoded_issues_response),
+				array(
+					'issues' => array(
+						array(
+							'fields' => array(
+								'Заголовок' => 'sample title 1',
+								'Описание' => 'sample description 1',
+								'issuetype' => array(
+									'self' => 'https://test.atlassian.net/rest/api/2/issuetype/10034',
+								),
+							),
+						),
+						array(
+							'fields' => array(
+								'Заголовок' => 'sample title 2',
+								'Описание' => 'sample description 2',
+								'issuetype' => array(
+									'self' => 'https://test.atlassian.net/rest/api/2/issuetype/10035',
+								),
+							),
+						),
+					),
+				),
+			),
+			'don\'t auto-map' => array(
+				0,
+				json_encode($decoded_issues_response),
+				$decoded_issues_response,
+			),
 		);
 	}
 
@@ -322,21 +335,17 @@ class ApiTest extends AbstractTestCase
 			'/rest/api/2/resolution',
 			array(),
 			$response
-		);
+		)->shouldBeCalledOnce();
 
-		$actual = $this->api->getResolutions();
-
+		// Perform the 1st call (uncached).
 		$response_decoded = json_decode($response, true);
-
 		$expected = array(
 			'1' => $response_decoded[0],
 			'10000' => $response_decoded[1],
 		);
-		$this->assertEquals($expected, $actual);
+		$this->assertEquals($expected, $this->api->getResolutions());
 
-		// Second time we call the method the results should be cached and not trigger an API Request.
-		$this->client->sendRequest(Api::REQUEST_GET, '/rest/api/2/resolution', array(), self::ENDPOINT, $this->credential)
-			->shouldNotBeCalled();
+		// Perform the 2nd call (cached).
 		$this->assertEquals($expected, $this->api->getResolutions(), 'Calling twice did not yield the same results');
 	}
 
@@ -349,21 +358,17 @@ class ApiTest extends AbstractTestCase
 			'/rest/api/2/field',
 			array(),
 			$response
-		);
+		)->shouldBeCalledOnce();
 
-		$actual = $this->api->getFields();
-
+		// Perform the 1st call (uncached).
 		$response_decoded = json_decode($response, true);
-
 		$expected = array(
 			'issuetype' => $response_decoded[0],
 			'timespent' => $response_decoded[1],
 		);
-		$this->assertEquals($expected, $actual);
+		$this->assertEquals($expected, $this->api->getFields());
 
-		// Second time we call the method the results should be cached and not trigger an API Request.
-		$this->client->sendRequest(Api::REQUEST_GET, '/rest/api/2/field', array(), self::ENDPOINT, $this->credential)
-			->shouldNotBeCalled();
+		// Perform the 2nd call (cached).
 		$this->assertEquals($expected, $this->api->getFields(), 'Calling twice did not yield the same results');
 	}
 
@@ -376,21 +381,17 @@ class ApiTest extends AbstractTestCase
 			'/rest/api/2/status',
 			array(),
 			$response
-		);
+		)->shouldBeCalledOnce();
 
-		$actual = $this->api->getStatuses();
-
+		// Perform the 1st call (uncached).
 		$response_decoded = json_decode($response, true);
-
 		$expected = array(
 			'1' => $response_decoded[0],
 			'3' => $response_decoded[1],
 		);
-		$this->assertEquals($expected, $actual);
+		$this->assertEquals($expected, $this->api->getStatuses());
 
-		// Second time we call the method the results should be cached and not trigger an API Request.
-		$this->client->sendRequest(Api::REQUEST_GET, '/rest/api/2/status', array(), self::ENDPOINT, $this->credential)
-			->shouldNotBeCalled();
+		// Perform the 2nd call (cached).
 		$this->assertEquals($expected, $this->api->getStatuses(), 'Calling twice did not yield the same results');
 	}
 
@@ -403,21 +404,17 @@ class ApiTest extends AbstractTestCase
 			'/rest/api/2/priority',
 			array(),
 			$response
-		);
+		)->shouldBeCalledOnce();
 
-		$actual = $this->api->getPriorities();
-
+		// Perform the 1st call (uncached).
 		$response_decoded = json_decode($response, true);
-
 		$expected = array(
 			'1' => $response_decoded[0],
 			'5' => $response_decoded[1],
 		);
-		$this->assertEquals($expected, $actual);
+		$this->assertEquals($expected, $this->api->getPriorities());
 
-		// Second time we call the method the results should be cached and not trigger an API Request.
-		$this->client->sendRequest(Api::REQUEST_GET, '/rest/api/2/priority', array(), self::ENDPOINT, $this->credential)
-			->shouldNotBeCalled();
+		// Perform the 2nd call (cached).
 		$this->assertEquals($expected, $this->api->getPriorities(), 'Calling twice did not yield the same results');
 	}
 
@@ -443,110 +440,108 @@ class ApiTest extends AbstractTestCase
 		$this->assertEquals($expected, $actual);
 	}
 
-	/**
-	 * @param string|integer $time_spent           Time spent.
-	 * @param array          $expected_rest_params Expected rest params.
-	 *
-	 * @return void
-	 * @dataProvider addWorkLogWithoutCustomParamsDataProvider
-	 */
-	public function testAddWorkLogWithoutCustomParams($time_spent, array $expected_rest_params)
+	public function testGetAttachmentsMetaInformation()
 	{
-		$response = '{}';
+		$response = file_get_contents(__DIR__ . '/resources/api_get_attachments_meta.json');
 
 		$this->expectClientCall(
-			Api::REQUEST_POST,
-			'/rest/api/2/issue/JRA-15/worklog',
-			$expected_rest_params,
-			$response
-		);
-
-		$actual = $this->api->addWorklog('JRA-15', $time_spent);
-
-		$this->assertEquals(json_decode($response, true), $actual, 'The response is json-decoded.');
-	}
-
-	public static function addWorkLogWithoutCustomParamsDataProvider()
-	{
-		return array(
-			'integer time spent' => array(12, array('timeSpentSeconds' => 12)),
-			'string time spent' => array('12m', array('timeSpent' => '12m')),
-		);
-	}
-
-	public function testAddWorklogWithCustomParams()
-	{
-		$response = '{}';
-
-		$started = date(Api::DATE_TIME_FORMAT, 1621026000);
-		$this->expectClientCall(
-			Api::REQUEST_POST,
-			'/rest/api/2/issue/JRA-15/worklog',
-			array('timeSpent' => '12m', 'started' => $started),
-			$response
-		);
-
-		$actual = $this->api->addWorklog('JRA-15', '12m', array('started' => $started));
-
-		$this->assertEquals(json_decode($response, true), $actual, 'The response is json-decoded.');
-	}
-
-	public function testDeleteWorkLogWithoutCustomParams()
-	{
-		$response = '{}';
-
-		$this->expectClientCall(
-			Api::REQUEST_DELETE,
-			'/rest/api/2/issue/JRA-15/worklog/11256',
+			Api::REQUEST_GET,
+			'/rest/api/2/attachment/meta',
 			array(),
 			$response
 		);
 
-		$actual = $this->api->deleteWorklog('JRA-15', 11256);
-
-		$this->assertEquals(json_decode($response, true), $actual, 'The response is json-decoded.');
-	}
-
-	public function testDeleteWorkLogWithCustomParams()
-	{
-		$response = '{}';
-
-		$this->expectClientCall(
-			Api::REQUEST_DELETE,
-			'/rest/api/2/issue/JRA-15/worklog/11256',
-			array('custom' => 'param'),
-			$response
-		);
-
-		$actual = $this->api->deleteWorklog('JRA-15', 11256, array('custom' => 'param'));
-
-		$this->assertEquals(json_decode($response, true), $actual, 'The response is json-decoded.');
+		$this->assertApiResponse($response, $this->api->getAttachmentsMetaInformation());
 	}
 
 	/**
-	 * Expects a particular client call.
-	 *
-	 * @param string       $method       Request method.
-	 * @param string       $url          URL.
-	 * @param array|string $data         Request data.
-	 * @param string       $return_value Return value.
-	 * @param boolean      $is_file      This is a file upload request.
-	 * @param boolean      $debug        Debug this request.
-	 *
-	 * @return void
+	 * @dataProvider getCreateMetaDataProvider
 	 */
-	protected function expectClientCall(
-		$method,
-		$url,
-		$data = array(),
-		$return_value,
-		$is_file = false,
-		$debug = false
+	public function testGetCreateMeta(
+		array $project_ids = null,
+		array $project_keys = null,
+		array $issue_type_ids = null,
+		array $issue_type_names = null,
+		array $expand = null,
+		array $params = array()
 	) {
-		$this->client
-			->sendRequest($method, $url, $data, self::ENDPOINT, $this->credential, $is_file, $debug)
-			->willReturn($return_value)
-			->shouldBeCalled();
+		$response = file_get_contents(__DIR__ . '/resources/api_get_create_meta.json');
+
+		$this->expectClientCall(
+			Api::REQUEST_GET,
+			'/rest/api/2/issue/createmeta',
+			$params,
+			$response
+		);
+
+		// Perform the API call.
+		$actual = $this->api->getCreateMeta($project_ids, $project_keys, $issue_type_ids, $issue_type_names, $expand);
+		$response_decoded = json_decode($response, true);
+
+		$this->assertEquals($response_decoded, $actual, 'The decoded response does not match the actual result.');
+	}
+
+	public static function getCreateMetaDataProvider()
+	{
+		return array(
+			'project_ids' => array(
+				array(123, 456),
+				null,
+				null,
+				null,
+				null,
+				array('projectIds' => '123,456'),
+			),
+			'project_names' => array(
+				null,
+				array('abc', 'def'),
+				null,
+				null,
+				null,
+				array('projectKeys' => 'abc,def'),
+			),
+			'project_ids+project_names' => array(
+				array(123, 456),
+				array('abc', 'def'),
+				null,
+				null,
+				null,
+				array('projectIds' => '123,456', 'projectKeys' => 'abc,def'),
+			),
+
+			'issue_type_ids' => array(
+				null,
+				null,
+				array(123, 456),
+				null,
+				null,
+				array('issuetypeIds' => '123,456'),
+			),
+			'issue_type_names' => array(
+				null,
+				null,
+				null,
+				array('abc', 'def'),
+				null,
+				array('issuetypeNames' => 'abc,def'),
+			),
+			'issue_type_ids+issue_type_names' => array(
+				null,
+				null,
+				array(123, 456),
+				array('abc', 'def'),
+				null,
+				array('issuetypeIds' => '123,456', 'issuetypeNames' => 'abc,def'),
+			),
+			'expand' => array(
+				null,
+				null,
+				null,
+				null,
+				array('aa', 'bb'),
+				array('expand' => 'aa,bb'),
+			),
+		);
 	}
 
 }
