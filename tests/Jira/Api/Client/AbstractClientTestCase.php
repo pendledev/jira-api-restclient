@@ -243,6 +243,13 @@ abstract class AbstractClientTestCase extends AbstractTestCase
 		);
 	}
 
+	public function testNoTrailingQuestionMarkInGetRequests()
+	{
+		$trace_result = $this->traceRequest(Api::REQUEST_GET);
+
+		$this->assertEquals('/', substr($trace_result['_SERVER']['REQUEST_URI'], -1), 'Incorrect URI ending symbol');
+	}
+
 	/**
 	 * Checks, that request contained specified content type.
 	 *

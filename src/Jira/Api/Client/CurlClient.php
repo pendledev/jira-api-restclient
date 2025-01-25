@@ -77,7 +77,7 @@ class CurlClient implements ClientInterface
 
 		$curl = curl_init();
 
-		if ( $method == 'GET' ) {
+		if ( $method == 'GET' && $data ) {
 			if ( !is_array($data) ) {
 				throw new \InvalidArgumentException('Data must be an array.');
 			}

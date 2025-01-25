@@ -151,7 +151,7 @@ class PHPClient implements ClientInterface
 			$context['http']['header'] = implode("\r\n", $header);
 			$context['http']['content'] = $__data;
 		}
-		elseif ( $method == 'GET' ) {
+		elseif ( $method == 'GET' && $data ) {
 			if ( !is_array($data) ) {
 				throw new \InvalidArgumentException('Data must be an array.');
 			}
