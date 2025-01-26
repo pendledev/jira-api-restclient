@@ -476,9 +476,8 @@ class ApiTest extends AbstractApiTestCase
 
 		// Perform the API call.
 		$actual = $this->api->getCreateMeta($project_ids, $project_keys, $issue_type_ids, $issue_type_names, $expand);
-		$response_decoded = json_decode($response, true);
 
-		$this->assertEquals($response_decoded, $actual, 'The decoded response does not match the actual result.');
+		$this->assertApiResponse($response, $actual, false);
 	}
 
 	public static function getCreateMetaDataProvider()
