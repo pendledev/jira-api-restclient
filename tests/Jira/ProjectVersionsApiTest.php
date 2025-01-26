@@ -21,10 +21,7 @@ final class ProjectVersionsApiTest extends AbstractApiTestCase
 			$response
 		);
 
-		$this->assertEquals(
-			json_decode($response, true),
-			$this->api->getVersions($project_key)
-		);
+		$this->assertApiResponse($response, $this->api->getVersions($project_key), false);
 	}
 
 	public function testCreateVersionWithoutCustomParams()

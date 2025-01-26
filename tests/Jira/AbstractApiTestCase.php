@@ -52,14 +52,18 @@ abstract class AbstractApiTestCase extends AbstractTestCase
 	/**
 	 * Checks, that response is correct.
 	 *
-	 * @param string       $expected_raw_response Expected raw response.
-	 * @param Result|false $actual_response       Actual response.
+	 * @param string             $expected_raw_response Expected raw response.
+	 * @param array|Result|false $actual_response       Actual response.
 	 *
 	 * @return void
 	 */
-	protected function assertApiResponse($expected_raw_response, $actual_response)
+	protected function assertApiResponse($expected_raw_response, $actual_response, $wrap_in_result = true)
 	{
-		$expected = new Result(json_decode($expected_raw_response, true));
+		$expected = json_decode($expected_raw_response, true);
+
+		if ( $wrap_in_result ) {
+			$expected = new Result($expected);
+		}
 
 		// You'll get "false", when unexpected API call was made.
 		if ( $actual_response !== false ) {

@@ -43,9 +43,7 @@ final class IssueWorklogsApiTest extends AbstractApiTestCase
 			$response
 		);
 
-		$actual = $this->api->addWorklog('JRA-15', $time_spent);
-
-		$this->assertEquals(json_decode($response, true), $actual, 'The response is json-decoded.');
+		$this->assertApiResponse($response, $this->api->addWorklog('JRA-15', $time_spent), false);
 	}
 
 	public static function addWorkLogWithoutCustomParamsDataProvider()
@@ -68,9 +66,11 @@ final class IssueWorklogsApiTest extends AbstractApiTestCase
 			$response
 		);
 
-		$actual = $this->api->addWorklog('JRA-15', '12m', array('started' => $started));
-
-		$this->assertEquals(json_decode($response, true), $actual, 'The response is json-decoded.');
+		$this->assertApiResponse(
+			$response,
+			$this->api->addWorklog('JRA-15', '12m', array('started' => $started)),
+			false
+		);
 	}
 
 	public function testDeleteWorkLogWithoutCustomParams()
@@ -84,9 +84,7 @@ final class IssueWorklogsApiTest extends AbstractApiTestCase
 			$response
 		);
 
-		$actual = $this->api->deleteWorklog('JRA-15', 11256);
-
-		$this->assertEquals(json_decode($response, true), $actual, 'The response is json-decoded.');
+		$this->assertApiResponse($response, $this->api->deleteWorklog('JRA-15', 11256), false);
 	}
 
 	public function testDeleteWorkLogWithCustomParams()
@@ -100,9 +98,11 @@ final class IssueWorklogsApiTest extends AbstractApiTestCase
 			$response
 		);
 
-		$actual = $this->api->deleteWorklog('JRA-15', 11256, array('custom' => 'param'));
-
-		$this->assertEquals(json_decode($response, true), $actual, 'The response is json-decoded.');
+		$this->assertApiResponse(
+			$response,
+			$this->api->deleteWorklog('JRA-15', 11256, array('custom' => 'param')),
+			false
+		);
 	}
 
 }

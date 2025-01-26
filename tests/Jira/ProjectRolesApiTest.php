@@ -21,10 +21,7 @@ final class ProjectRolesApiTest extends AbstractApiTestCase
 			$response
 		);
 
-		$actual = $this->api->getRoles($project_id);
-
-		$expected = json_decode($response, true);
-		$this->assertEquals($expected, $actual);
+		$this->assertApiResponse($response, $this->api->getRoles($project_id), false);
 	}
 
 	public function testGetProjectRoleDetails()
@@ -40,10 +37,7 @@ final class ProjectRolesApiTest extends AbstractApiTestCase
 			$response
 		);
 
-		$actual = $this->api->getRoleDetails($project_id, $role_id);
-
-		$expected = json_decode($response, true);
-		$this->assertEquals($expected, $actual);
+		$this->assertApiResponse($response, $this->api->getRoleDetails($project_id, $role_id), false);
 	}
 
 }
