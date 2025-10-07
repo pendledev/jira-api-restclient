@@ -38,7 +38,7 @@ class ApiTest extends AbstractApiTestCase
 
 		$this->expectClientCall(
 			Api::REQUEST_GET,
-			'/rest/api/2/search',
+			'/rest/api/2/search/jql',
 			array(
 				'jql' => 'test',
 				'startAt' => 5,

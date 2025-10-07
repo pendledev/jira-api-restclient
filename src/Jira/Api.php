@@ -623,13 +623,13 @@ class Api
 	 * @param string  $fields      Fields.
 	 *
 	 * @return Result
-	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-search/#api-rest-api-2-search-get
+	 * @link   https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-search/#api-rest-api-2-search-jql-get
 	 */
 	public function search($jql, $start_at = 0, $max_results = 20, $fields = '*navigable')
 	{
 		$result = $this->api(
 			self::REQUEST_GET,
-			'/rest/api/2/search',
+			'/rest/api/2/search/jql',
 			array(
 				'jql' => $jql,
 				'startAt' => $start_at,
